@@ -12,8 +12,8 @@ class DeckItem(scrapy.Item):
 
     championship = scrapy.Field()
     player = scrapy.Field()
-    player_rank = scrapy.Field()
     deck_name = scrapy.Field()
     level = scrapy.Field()
     date = scrapy.Field()
     cards = scrapy.Field()
+    rank = scrapy.Field()
