@@ -17,3 +17,9 @@ class DeckItem(scrapy.Item):
     date = scrapy.Field()
     cards = scrapy.Field()
     rank = scrapy.Field()
+    cards = scrapy.Field()
+
+class CardItem(scrapy.Item):
+	
+	qtt = scrapy.Field()
+	name = scrapy.Field()
