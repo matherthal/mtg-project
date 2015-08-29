@@ -62,17 +62,17 @@ class MtgCrawlerSpider(Spider):
     def parse_cards(self, response):
         item = response.meta['item']
         
+        #DEBUG
+        # from scrapy.shell import inspect_response
+        # inspect_response(response, self)
+        
+        item['format'] = response.xpath('//td[@class="S14"]/text()')[0].extract().strip()
         item['cards'] = []
-
+        
         cards = response.xpath('//td[@class="G14"]')
         for index, card in enumerate(cards):
             card_item = CardItem()
-            card_item['qtt'] = card.xpath('div[@class="chosen_tr"]/text()').extract_first()
-            card_item['name'] = card.xpath('div[@class="chosen_tr"]/span/text()').extract_first()
+            card_item['qtt'] = card.xpath('div/text()').extract_first()
+            card_item['name'] = card.xpath('div/span/text()').extract_first()
             item['cards'].append(card_item)
-            # logging.debug(str(index))
-            # logging.debug(str(card_item['name']))
-            # item['cards'].append(dict(card_item))
-
-        # yield item
         return item

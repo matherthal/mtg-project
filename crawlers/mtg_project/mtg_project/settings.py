@@ -93,5 +93,8 @@ MONGODB_PORT = 27017
 MONGODB_DB = "mtgtop8"
 MONGODB_COLLECTION = "winning_decks"
 DOWNLOAD_DELAY = 3
-LOG_LEVEL = 'INFO'
-STATS_ENABLED = True
+# LOG_LEVEL = 'INFO'
+# LOG_LEVEL = 'ERROR'
+# LOG_FILE = 'scrapy.log'
+# from datetime import datetime
+# LOG_FILE = "scrapy_%s_%s.log" % (BOT_NAME, datetime.now())
