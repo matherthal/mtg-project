@@ -30,6 +30,6 @@ class MtgProjectPipeline(object):
                 raise DropItem("Missing {0}!".format(data))
         if valid:
             self.collection.insert(dict(item))
-            logging.info("Card added to MongoDB database!")
+            logging.info("Deck added to MongoDB database!")
         return item
       

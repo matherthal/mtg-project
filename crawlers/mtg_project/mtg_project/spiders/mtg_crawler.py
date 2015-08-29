@@ -49,25 +49,30 @@ class MtgCrawlerSpider(Spider):
             # join with base url since profile url is relative
             follow = urljoin_rfc(base_url, deck_url)
 
-            # yield Request(follow, callback = self.parse_cards, meta={'item':item})
+            yield Request(follow, callback = self.parse_cards, meta={'item':item})
+            
+            # yield item
 
-            yield item
+
+        # next_page = response.css("ul.navigation > li.next-page > a::attr('href')")
+        # if next_page:
+        #     url = response.urljoin(next_page[0].extract())
+        #     yield Request(url, self.parse_articles_follow_next_page)
 
     def parse_cards(self, response):
         item = response.meta['item']
         
-        logging.debug("ENTROU")
         item['cards'] = []
 
         cards = response.xpath('//td[@class="G14"]')
-        for index, card in cards:
+        for index, card in enumerate(cards):
             card_item = CardItem()
             card_item['qtt'] = card.xpath('div[@class="chosen_tr"]/text()').extract_first()
             card_item['name'] = card.xpath('div[@class="chosen_tr"]/span/text()').extract_first()
+            item['cards'].append(card_item)
+            # logging.debug(str(index))
+            # logging.debug(str(card_item['name']))
+            # item['cards'].append(dict(card_item))
 
-            logging.debug(str(index))
-            logging.debug(str(card_item['name']))
-            item['cards'].append(dict(card_item))
-
-            yield item
-        # return item
+        # yield item
+        return item
