@@ -6,10 +6,12 @@ from scrapy import Spider
 # from scrapy.spiders import CrawlSpider
 from scrapy.utils.response import get_base_url
 from scrapy.utils.url import urljoin_rfc
-from scrapy.http import Request 
+from scrapy.http import Request, FormRequest 
 
 import logging
-from time import strptime
+# from time import strptime
+import time
+import math
 
 class MtgCrawlerSpider(Spider):
 
@@ -20,6 +22,18 @@ class MtgCrawlerSpider(Spider):
     ]
 
     def parse(self, response):
+        curr_page = 0
+        total_decks = int(response.xpath('//div[@class="w_title"]/text()').extract_first().split()[0])
+        decks_per_page = 25
+        max_page = int(math.ceil(total_decks / float(decks_per_page)))
+
+        for i in range(1,max_page+1):
+            yield FormRequest.from_response(response, 
+                formname='search_form', 
+                formdata={'current_page': str(i)}, 
+                callback=self.parse_deck)
+
+    def parse_deck(self, response):
         decks = response.xpath('//table[@class="Stable"]/tr[@class="hover_tr"]')
         
         base_url = get_base_url(response)
@@ -44,20 +58,14 @@ class MtgCrawlerSpider(Spider):
                 count += 1
             item['level'] = count
 
-            # get profile url
+            # get cards from this deck through this url
             deck_url = deck.xpath('td[2]/a/@href').extract_first()
-            # join with base url since profile url is relative
+            # join with base url since this url is relative
             follow = urljoin_rfc(base_url, deck_url)
-
-            yield Request(follow, callback = self.parse_cards, meta={'item':item})
             
-            # yield item
+            request = Request(follow, callback = self.parse_cards, meta={'item':item})
 
-
-        # next_page = response.css("ul.navigation > li.next-page > a::attr('href')")
-        # if next_page:
-        #     url = response.urljoin(next_page[0].extract())
-        #     yield Request(url, self.parse_articles_follow_next_page)
+            yield request
 
     def parse_cards(self, response):
         item = response.meta['item']
@@ -75,4 +83,5 @@ class MtgCrawlerSpider(Spider):
             card_item['qtt'] = card.xpath('div/text()').extract_first()
             card_item['name'] = card.xpath('div/span/text()').extract_first()
             item['cards'].append(card_item)
+
         return item
